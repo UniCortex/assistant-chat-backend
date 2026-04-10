@@ -1,37 +1,6 @@
+name: assistant-chat-backend
+
 services:
-  redis:
-    image: redis:7.4
-    container_name: assistant-redis
-    restart: unless-stopped
-    command: >
-      redis-server
-      --save 60 1
-      --loglevel notice
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru
-    volumes:
-      - redis-data:/data
-    ports:
-      - "6379:6379"
-    networks:
-      - assistant-net
-
-  nats:
-    image: nats:2.10
-    container_name: assistant-nats
-    restart: unless-stopped
-    command: >
-      -js
-      --store_dir /data
-      -m 8222
-    volumes:
-      - nats-data:/data
-    ports:
-      - "4222:4222"
-      - "8222:8222"
-    networks:
-      - assistant-net
-
   backend:
     build:
       context: .
@@ -45,18 +14,8 @@ services:
       - "8000:8000"
     networks:
       - assistant-net
-    depends_on:
-      - redis
-      - nats
 
-
-name: assistant-chat-backend
 networks:
   assistant-net:
+    external: true
     name: assistant-net
-    driver: bridge
-
-
-volumes:
-  redis-data:
-  nats-data:
